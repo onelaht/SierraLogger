@@ -9,6 +9,7 @@ import {HiddenInput, LogAccountsMUI} from "./LogAccountsMUI";
 // global vars
 import {useGrid} from "../Providers/ProviderGrid";
 import {useTag} from "../Providers/ProviderTag";
+import {useFilter} from "../Providers/ProviderFilter";
 // types and interfaces
 import {Row} from "../Types/Row";
 import {IAccount} from "../Types/IAccount";
@@ -16,10 +17,13 @@ import {IAccountData} from "../Types/IAccountData";
 
 export default function LogAccounts() {
     // global vars
-    const {setGridData, gridRef, colDefs, accounts} = useGrid();
+    const {gridRef, colDefs, accounts, setRowData} = useGrid();
     const {tagDefs} = useTag();
+    const {setUniqueAccount, setUniqueSymbol} = useFilter();
     // MUI; hidden file upload form
     const VisuallyHiddenInput = styled('input')(HiddenInput);
+    // store raw user log data
+    const [gridData, setGridData] = useState<string | null>(null);
     // store account name
     const [accountName, setAccountName] = useState<string>("");
     // store filename
@@ -95,6 +99,35 @@ export default function LogAccounts() {
             console.error("Error occurred in createAccount():", res.status, text);
         }
     }, [gridRef, unsplitDef, tagDefs, accountName])
+
+    // sends raw file to backend and retrieves split array
+    const toBackend = useCallback( async () => {
+        // send raw file
+        await fetch("/api/upload",
+            {
+                method: "POST",
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({UserData: gridData})
+            })
+            // retrieve data and assign as row data
+            .then(async res => {
+                const data = await res.json();
+                // assign data
+                data?.data && setRowData(data.data);
+                data?.uSymbol && setUniqueSymbol(data.uSymbol);
+                data?.uAccount && setUniqueAccount(data.uAccount);
+            })
+            // handle any error that occurs
+            .catch(error => {
+                console.error("Error during fetch:", error);
+            });
+    }, [gridData, setUniqueAccount, setUniqueSymbol, setRowData])
+
+    // if user uploads a file, call toBackend (send data to backend)
+    useEffect(() => {
+        if(!gridData) return;
+        toBackend();
+    }, [gridData])
 
     return (
         <Box sx={LogAccountsMUI.Container}>
