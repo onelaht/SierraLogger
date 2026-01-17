@@ -13,8 +13,8 @@ import {IAccountData} from "../Types/IAccountData";
 
 interface IGridContextType {
     gridRef: React.RefObject<AgGridReact<Row> | null>;
-    gridData: string | null;
-    setGridData: React.Dispatch<React.SetStateAction<string | null>>;
+    rowData: Row[] | null;
+    setRowData: React.Dispatch<React.SetStateAction<Row[] | null>>;
     colDefs:ColDef<Row>[];
     setColDefs: React.Dispatch<React.SetStateAction<ColDef<Row>[]>>;
     accounts: Map<string, IAccountData>;
@@ -26,8 +26,8 @@ const GridContext = createContext<IGridContextType | null>(null);
 
 export default function ProviderGrid({children}:{children: ReactNode}) {
     const gridRef = useRef<AgGridReact<Row> | null>(null);
-    const [gridData, setGridData] = useState<string | null>(null);
     const [accounts, setAccounts] = useState<Map<string, IAccountData>>(new Map<string, IAccountData>());
+    const [rowData, setRowData] = useState<Row[] | null>(null);
     const convertDuration = useCallback((seconds:number) => {
         const h = Math.floor(seconds / 3600);
         const m = Math.floor((seconds % 3600) / 60);
@@ -255,7 +255,7 @@ export default function ProviderGrid({children}:{children: ReactNode}) {
     }, [colDefs])
 
     return(
-        <GridContext value={{gridRef, gridData, setGridData, colDefs, setColDefs, accounts, setAccounts, colFields}}>
+        <GridContext value={{gridRef, rowData, setRowData, colDefs, setColDefs, accounts, setAccounts, colFields}}>
             {children}
         </GridContext>
     )
