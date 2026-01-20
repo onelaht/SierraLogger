@@ -14,11 +14,12 @@ import {useFilter} from "../Providers/ProviderFilter";
 import {Row} from "../Types/Row";
 import {IAccount} from "../Types/IAccount";
 import {IAccountData} from "../Types/IAccountData";
+import {ColDef} from "ag-grid-community";
 
 export default function LogAccounts() {
     // global vars
-    const {gridRef, colDefs, accounts, setRowData} = useGrid();
-    const {tagDefs} = useTag();
+    const {gridRef, colDefs, accounts, setRowData, setColDefs} = useGrid();
+    const {tagDefs, setTagDefs} = useTag();
     const {setUniqueAccount, setUniqueSymbol} = useFilter();
     // MUI; hidden file upload form
     const VisuallyHiddenInput = styled('input')(HiddenInput);
@@ -123,6 +124,22 @@ export default function LogAccounts() {
             });
     }, [gridData, setUniqueAccount, setUniqueSymbol, setRowData])
 
+    // set selected account to grid
+    const setAccount = useCallback((acc:string) => {
+        if(!accounts.has(acc)) return;
+        const account = accounts.get(acc) as IAccountData;
+        // assign column/tag definitions and row data
+        setRowData(account.RowData);
+        setTagDefs(account.TagDefs);
+        setColDefs(prev => {
+            const temp = [...prev];
+            account.TagDefs.forEach((i:ColDef<Row>) => {
+                temp.push(i);
+            })
+            return temp;
+        });
+    }, [accounts, setTagDefs, setColDefs, setRowData])
+
     // if user uploads a file, call toBackend (send data to backend)
     useEffect(() => {
         if(!gridData) return;
@@ -141,6 +158,16 @@ export default function LogAccounts() {
                             <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
                                 <Typography>{k}</Typography>
                             </AccordionSummary>
+                            <AccordionDetails>
+                                <Box sx={{m:1, display: "flex", flexDirection: "column"}}>
+                                    <Button
+                                        variant="outlined"
+                                        onClick={() => setAccount(k)}
+                                    >
+                                        Load
+                                    </Button>
+                                </Box>
+                            </AccordionDetails>
                         </Accordion>
                     ))}
                 </AccordionDetails>
