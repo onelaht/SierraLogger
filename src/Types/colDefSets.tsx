@@ -41,3 +41,22 @@ export const integerSet:Set<string> = (
         ]
     )
 )
+
+// duration custom filter
+export const durationSet:Set<string> = (
+    new Set<string>(
+        [
+            "Duration"
+        ]
+    )
+)
+
+// checkbox custom filter
+export const checkboxSet:Set<string> = (
+    new Set<string>(
+        [
+            "Trade Type",
+            "Symbol"
+        ]
+    )
+)
