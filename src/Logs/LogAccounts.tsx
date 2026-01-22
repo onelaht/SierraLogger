@@ -229,7 +229,7 @@ export default function LogAccounts() {
                                 <Typography>{k}</Typography>
                             </AccordionSummary>
                             <AccordionDetails>
-                                <Box sx={{m:1, display: "flex", flexDirection: "column"}}>
+                                <Box sx={LogAccountsMUI.TabFlexContainer}>
                                     <Button
                                         variant="outlined"
                                         onClick={() => setAccount(k)}
