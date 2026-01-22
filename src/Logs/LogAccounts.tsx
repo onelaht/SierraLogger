@@ -14,11 +14,18 @@ import {useFilter} from "../Providers/ProviderFilter";
 import {Row} from "../Types/Row";
 import {IAccount} from "../Types/IAccount";
 import {IAccountData} from "../Types/IAccountData";
+import {floatPercentSet, integerSet, floatRoundedSet, checkboxSet, durationSet} from "../Types/colDefSets";
+import {defaultColDefs} from "../Types/defaultColDefs";
+// ag grid: types
+import {ColDef, ValueFormatterParams, ValueGetterParams} from "ag-grid-community";
+// ag grid: custom filters
+import FilterDuration from "../Filters/FilterDuration";
+import FilterCheckboxSet from "../Filters/FilterCheckboxSet";
 
 export default function LogAccounts() {
     // global vars
-    const {gridRef, colDefs, accounts, setRowData} = useGrid();
-    const {tagDefs} = useTag();
+    const {gridRef, colDefs, accounts, setRowData, setColDefs} = useGrid();
+    const {tagDefs, setTagDefs} = useTag();
     const {setUniqueAccount, setUniqueSymbol} = useFilter();
     // MUI; hidden file upload form
     const VisuallyHiddenInput = styled('input')(HiddenInput);
@@ -53,6 +60,8 @@ export default function LogAccounts() {
         if (typeof rawString === "string") {
             // assign data
             setGridData(rawString);
+            // use default colDef configuration
+            handleColDefs(defaultColDefs, []);
         }
     }, [rawString, setGridData])
 
@@ -123,6 +132,84 @@ export default function LogAccounts() {
             });
     }, [gridData, setUniqueAccount, setUniqueSymbol, setRowData])
 
+    // stringify duration value
+    const convertDuration = useCallback((seconds:number) => {
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        return [h, m, s]
+            .map(v => String(v).padStart(2, "0"))
+            .join(":");
+    }, [])
+
+    // handles colDef configuration/assignment
+    // - assigns grid display based on column type and filter
+    // - assigns tagDef arr (if exists)
+    // - combines tagDef and colDef (if both exists)
+    // - assigns [] if passed tagDef and colDef is empty
+    const handleColDefs = useCallback((rawColDef:ColDef<Row>[], rawTagDef:ColDef<Row>[]) => {
+        // var to store modified colDef arr
+        const temp:ColDef<Row>[] = [];
+        // traverse through colDef arr
+        rawColDef?.length > 0 && rawColDef.forEach((i:ColDef<Row>) => {
+            // var to store modified specific col set
+            let newCol:ColDef<Row> = i;
+            // if col is using duration filter
+            if(durationSet.has(newCol.field as string)) {
+                delete newCol.filter;
+                newCol = Object.assign({
+                    filter: FilterDuration,
+                    valueGetter: (p:ValueGetterParams) => {return parseInt(p.data?.[newCol.field as string])},
+                    valueFormatter: (p:ValueFormatterParams) => {return convertDuration(p.value)}
+                }, newCol)
+            // if col is using checkbox filter
+            } else if(checkboxSet.has(newCol.field as string)) {
+                delete newCol.filter;
+                newCol = Object.assign({
+                    filter: FilterCheckboxSet
+                }, newCol);
+            // if col is float type and displayed as %
+            } else if(floatPercentSet.has(newCol.field as string)) {
+                newCol = Object.assign({
+                    valueGetter: (p:ValueGetterParams) => {return parseFloat(p.data?.[newCol.field as string])},
+                    valueFormatter: (p:any) => {return (p.value).toFixed(2) + "%"}
+                }, newCol)
+            // if col is integer type
+            } else if(integerSet.has(newCol.field as string)) {
+                newCol = Object.assign({
+                    valueGetter: (p:ValueGetterParams) => {return parseInt(p.data?.[newCol.field as string])}
+                }, newCol)
+            // if col is float type and rounded
+            } else if(floatRoundedSet.has(newCol.field as string)) {
+                newCol = Object.assign({
+                    valueGetter: (p:ValueGetterParams) => {return parseFloat(p.data?.[newCol.field as string])},
+                    valueFormatter: (p:ValueFormatterParams) => {return (p.value?.toFixed(2))}
+                }, newCol)
+            }
+            // append to temp array
+            temp.push(newCol);
+        })
+        // if tags exists
+        if(rawTagDef?.length > 0) {
+            // append to current colDef arr
+            setTagDefs(rawTagDef);
+            rawTagDef.forEach((i:ColDef<Row>) => {
+                temp.push(i);
+            })
+        }
+        // assign as colDef arr
+        setColDefs(temp);
+    }, [setColDefs, setTagDefs, convertDuration])
+
+    // set selected account to grid
+    const setAccount = useCallback((acc:string) => {
+        if(!accounts.has(acc)) return;
+        const account = accounts.get(acc) as IAccountData;
+        // assign column/tag definitions and row data
+        setRowData(account.RowData);
+        handleColDefs(account.ColDefs, account.TagDefs);
+    }, [accounts, setRowData, handleColDefs])
+
     // if user uploads a file, call toBackend (send data to backend)
     useEffect(() => {
         if(!gridData) return;
@@ -141,6 +228,16 @@ export default function LogAccounts() {
                             <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
                                 <Typography>{k}</Typography>
                             </AccordionSummary>
+                            <AccordionDetails>
+                                <Box sx={LogAccountsMUI.TabFlexContainer}>
+                                    <Button
+                                        variant="outlined"
+                                        onClick={() => setAccount(k)}
+                                    >
+                                        Load
+                                    </Button>
+                                </Box>
+                            </AccordionDetails>
                         </Accordion>
                     ))}
                 </AccordionDetails>
