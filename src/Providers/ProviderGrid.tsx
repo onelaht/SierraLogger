@@ -1,5 +1,5 @@
 // react
-import React, {createContext, ReactNode, useContext, useMemo, useRef, useState} from 'react';
+import React, {createContext, ReactNode, useContext, useRef, useState} from 'react';
 // types
 import type { Row } from "../Types/Row"
 // ag grid
@@ -16,7 +16,6 @@ interface IGridContextType {
     setColDefs: React.Dispatch<React.SetStateAction<ColDef<Row>[]>>;
     accounts: Map<string, IAccountData>;
     setAccounts: React.Dispatch<React.SetStateAction<Map<string, IAccountData>>>;
-    colFields:string[];
 }
 
 const GridContext = createContext<IGridContextType | null>(null);
@@ -32,15 +31,8 @@ export default function ProviderGrid({children}:{children: ReactNode}) {
     // - implements apply and reset buttons
     const [colDefs, setColDefs] = useState<ColDef<Row>[]> ([]);
 
-    // returns all column field names
-    const colFields = useMemo(() => {
-        return colDefs.map((i:ColDef<Row>) => {
-            return i.field as string;
-        })
-    }, [colDefs])
-
     return(
-        <GridContext value={{gridRef, rowData, setRowData, colDefs, setColDefs, accounts, setAccounts, colFields}}>
+        <GridContext value={{gridRef, rowData, setRowData, colDefs, setColDefs, accounts, setAccounts}}>
             {children}
         </GridContext>
     )
