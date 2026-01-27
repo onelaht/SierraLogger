@@ -67,15 +67,15 @@ export default function LogColVisibility() {
     const modifyAll = useCallback((state:boolean) => {
         // if empty, ignore
         if(colMap.size === 0) return;
+        // copy current column map
+        let temp = new Map<string, boolean>(colMap);
         // modify all checkboxes based on state var
-        setColMap(prev => {
-            let temp = new Map<string, boolean>(prev);
-            Array.from(temp.keys()).forEach((k:string) => {
-                temp.set(k, !state);
-                colVisibility(k, !state);
-            })
-            return temp;
+        Array.from(temp.keys()).forEach((k:string) => {
+            colVisibility(k, !state);
+            temp.set(k, !state);
         })
+        // update column map
+        setColMap(temp);
     }, [setColMap, colMap, colVisibility])
 
     return (
