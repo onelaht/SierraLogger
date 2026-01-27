@@ -24,7 +24,7 @@ import FilterCheckboxSet from "../Filters/FilterCheckboxSet";
 
 export default function LogAccounts() {
     // global vars
-    const {gridRef, colDefs, accounts, setRowData, setColDefs} = useGrid();
+    const {gridRef, colDefs, setAccounts, accounts, setRowData, setColDefs} = useGrid();
     const {tagDefs, setTagDefs} = useTag();
     const {setUniqueAccount, setUniqueSymbol} = useFilter();
     // MUI; hidden file upload form
@@ -78,6 +78,26 @@ export default function LogAccounts() {
         })
     }, [colDefs, tagDefs, gridRef])
 
+    const refreshAccounts = useCallback(async() => {
+        // fetch data
+        const res = await fetch("/api/retrieveAccounts")
+        // if any error occurs
+        if(!res.ok) {
+            const err = res.text();
+            console.error("Error occurred in fetchAccounts: ", res.status, err);
+        }
+        // get values
+        const data = await res.json();
+        // if not empty, initialize account map
+        if(data?.accounts?.length > 0) {
+            const temp:Map<string, IAccountData> = new Map<string, IAccountData>();
+            data.accounts.forEach((i:IAccount) => {
+                temp.set(i.AccName, i.Data);
+            })
+            setAccounts(temp);
+        }
+    }, [setAccounts])
+
     // save data as new account
     const createAccount = useCallback(async () => {
         if(!gridRef?.current) return;
@@ -106,8 +126,10 @@ export default function LogAccounts() {
         if(!res.ok) {
             const text = await res.text();
             console.error("Error occurred in createAccount():", res.status, text);
-        }
-    }, [gridRef, unsplitDef, tagDefs, accountName])
+        } else
+            await refreshAccounts();
+
+    }, [gridRef, unsplitDef, tagDefs, accountName, refreshAccounts])
 
     // sends raw file to backend and retrieves split array
     const toBackend = useCallback( async () => {
