@@ -70,13 +70,13 @@ export default function LogAccounts() {
         // return existing defs if no tags are found
         if(tagDefs.length < 1) return colDefs;
         // copy column defs
-        const tempDefs = [...colDefs];
+        const tempDefs = [...gridRef?.current?.api?.getColumnDefs() as ColDef<Row>[]];
         // filter out tag defs
         return tempDefs.filter((i) => {
             const idx = tagDefs.indexOf(i);
             return idx < 0;
         })
-    }, [colDefs, tagDefs])
+    }, [colDefs, tagDefs, gridRef])
 
     // save data as new account
     const createAccount = useCallback(async () => {
@@ -223,7 +223,7 @@ export default function LogAccounts() {
                     <Typography>Accounts ({accounts.size})</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                    {accounts.size > 0 && Array.from(accounts.entries()).map(([k, v]) => (
+                    {accounts.size > 0 && Array.from(accounts.keys()).map((k:string) => (
                         <Accordion>
                             <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
                                 <Typography>{k}</Typography>

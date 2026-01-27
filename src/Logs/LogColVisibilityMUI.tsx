@@ -7,4 +7,12 @@ export const LogColVisibilityMUI = {
         justifyContent: "start",
         p: 0
     },
+    MessageBox: {
+        display: "flex",
+        flexDirection: "column",
+        gap: 3
+    },
+    TextAlign: {
+        alignSelf: "flex-start"
+    }
 }
