@@ -24,7 +24,7 @@ import {LogTagsMUI} from "./LogTagsMUI"
 
 export default function LogTags() {
     // global vars
-    const {setColDefs} = useGrid();
+    const {setColDefs, gridRef} = useGrid();
     const {tagDefs, setTagDefs} = useTag();
     // track tags with edit mode enabled
     const [edit, setEdit] = useState<string>("");
@@ -60,15 +60,15 @@ export default function LogTags() {
             return tempDefs;
         })
         // add to column list
-        setColDefs(prev => {
-            const tempDefs = [...prev];
+        setColDefs(() => {
+            const tempDefs = [...gridRef?.current?.api?.getColumnDefs() as ColDef<Row>[]]
             tempDefs.push(col);
             return tempDefs;
         })
         // reset text fields
         setTagName("");
         setParameters([""]);
-    }, [tagName, parameters, setColDefs, setTagDefs])
+    }, [tagName, parameters, setColDefs, setTagDefs, gridRef])
 
     // removes tag from column list
     const handleDeleteTag = useCallback((col:ColDef<Row>) => {
