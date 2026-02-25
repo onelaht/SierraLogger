@@ -5,7 +5,7 @@ import { themeAlpine } from "ag-grid-community";
 // global vars
 import { useGrid } from "../Providers/ProviderGrid";
 // styling
-import "./LogTable.css";
+import "./MUIStyling/LogTable.css";
 
 export default function LogTable() {
     // global vars

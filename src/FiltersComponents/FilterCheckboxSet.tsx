@@ -8,7 +8,7 @@ import {useFilter} from "../Providers/ProviderFilter";
 // mui components
 import {Checkbox, FormControlLabel, FormGroup} from "@mui/material";
 // styling
-import '../Filters/FilterCheckboxSet.css'
+import './/FilterCheckboxSet.css'
 
 export default function FilterCheckboxSet ({onModelChange, colDef}: CustomFilterProps) {
     // retrieve unique sets for column

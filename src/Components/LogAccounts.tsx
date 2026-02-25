@@ -5,7 +5,7 @@ import {Box, Accordion, AccordionSummary, AccordionDetails,
         Typography, styled, Button, Divider, TextField} from '@mui/material'
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 // MUI styling
-import {HiddenInput, LogAccountsMUI} from "./LogAccountsMUI";
+import {HiddenInput, LogAccountsMUI} from "./MUIStyling/LogAccountsMUI";
 // global vars
 import {useGrid} from "../Providers/ProviderGrid";
 import {useTag} from "../Providers/ProviderTag";
@@ -19,8 +19,8 @@ import {defaultColDefs} from "../Types/defaultColDefs";
 // ag grid: types
 import {ColDef, ValueFormatterParams, ValueGetterParams} from "ag-grid-community";
 // ag grid: custom filters
-import FilterDuration from "../Filters/FilterDuration";
-import FilterCheckboxSet from "../Filters/FilterCheckboxSet";
+import FilterDuration from "../FiltersComponents/FilterDuration";
+import FilterCheckboxSet from "../FiltersComponents/FilterCheckboxSet";
 
 export default function LogAccounts() {
     // global vars

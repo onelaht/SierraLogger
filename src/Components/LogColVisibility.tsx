@@ -5,7 +5,7 @@ import {useGrid} from "../Providers/ProviderGrid";
 // mui components
 import {Box, Checkbox, FormControl, ListItemText, MenuItem, Typography} from "@mui/material";
 // mui styling
-import {LogColVisibilityMUI} from "./LogColVisibilityMUI";
+import {LogColVisibilityMUI} from "./MUIStyling/LogColVisibilityMUI";
 
 export default function LogColVisibility() {
     // global vars

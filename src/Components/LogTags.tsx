@@ -20,7 +20,7 @@ import {
 // mui icons
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 // mui styling
-import {LogTagsMUI} from "./LogTagsMUI"
+import {LogTagsMUI} from "./MUIStyling/LogTagsMUI"
 
 export default function LogTags() {
     // global vars
