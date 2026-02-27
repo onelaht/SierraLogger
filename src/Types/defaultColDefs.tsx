@@ -1,8 +1,8 @@
 import {ColDef} from "ag-grid-community";
 import {Row} from "./Row";
 // customer filters
-import FilterDuration from "../Filters/FilterDuration";
-import FilterCheckboxSet from "../Filters/FilterCheckboxSet";
+import FilterDuration from "../FiltersComponents/FilterDuration";
+import FilterCheckboxSet from "../FiltersComponents/FilterCheckboxSet";
 
 export const defaultColDefs:ColDef<Row>[] = (
     [
