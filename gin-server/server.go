@@ -71,6 +71,22 @@ func getAccountNames(c *gin.Context) {
 	})
 }
 
+func getAccount(c *gin.Context) {
+	type Payload struct {
+		AccName string `json:"name"`
+	}
+	var payload Payload
+	//
+	if err := c.BindJSON(&payload); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+	}
+	//
+	acc, _ := db_accounts.GetAccount(payload.AccName)
+	c.JSON(http.StatusOK, gin.H{
+		"account": acc,
+	})
+}
+
 // contains endpoint initialization and handlers
 func main() {
 	// initialize gin
@@ -78,6 +94,7 @@ func main() {
 	// upload endpoint handler
 	router.POST("/upload", rawUpload)
 	router.POST("/saveNewAccount", saveNewAccount)
+	router.POST("/getAccount", getAccount)
 	router.GET("/retrieveAccounts", retrieveAccounts)
 	router.GET("/getAccountNames", getAccountNames)
 	// run via localhost:5000

@@ -40,6 +40,29 @@ func NewAccount(acc types.Account) error {
 	return nil
 }
 
+func GetAccount(accName string) (*types.Accs, error) {
+	var acc types.Accs
+	ctx := context.Background()
+	// connect user and db
+	conn, err := pgx.Connect(ctx, "postgres://user1:pass@localhost:5432/db1_proj1?sslmode=disable")
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close(ctx)
+	queries := db.New(conn)
+	//
+	tuple, err := queries.GetAccount(ctx, accName)
+	if err != nil {
+		return nil, err
+	}
+	// set to var
+	acc.AccName = tuple.Name
+	json.Unmarshal(tuple.Rowdata, &acc.RowData)
+	json.Unmarshal(tuple.Coldefs, &acc.ColDefs)
+	json.Unmarshal(tuple.Tagdefs, &acc.TagDefs)
+	return &acc, nil
+}
+
 func GetAccountNames() []string {
 	ctx := context.Background()
 	// connect user and db
