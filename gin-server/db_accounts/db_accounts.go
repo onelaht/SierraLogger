@@ -40,6 +40,24 @@ func NewAccount(acc types.Account) error {
 	return nil
 }
 
+func GetAccountNames() []string {
+	ctx := context.Background()
+	// connect user and db
+	conn, err := pgx.Connect(ctx, "postgres://user1:pass@localhost:5432/db1_proj1?sslmode=disable")
+	if err != nil {
+		return nil
+	}
+	defer conn.Close(ctx)
+	//
+	queries := db.New(conn)
+	names, err := queries.GetAccountNames(ctx)
+	//
+	if err != nil {
+		return nil
+	}
+	return names
+}
+
 // GetAllAccount
 // retrieves all tuples from account table
 // - returns an empty array if empty or any error occurs
