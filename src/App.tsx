@@ -2,6 +2,8 @@
 import React, {useCallback, useEffect, useState} from 'react';
 // styling
 import "./App.css"
+// react router
+import {BrowserRouter as Router, Routes, Route} from "react-router-dom"
 // split components
 import LogLayout from "./Components/LogLayout";
 import ProviderApp from "./Providers/ProviderApp";
@@ -49,7 +51,11 @@ function AppInner() {
 export default function App() {
     return (
         <ProviderApp>
-            <AppInner/>
+            <Router>
+                <Routes>
+                    <Route path="/:account?" element={<AppInner/>}/>
+                </Routes>
+            </Router>
         </ProviderApp>
     )
 }
