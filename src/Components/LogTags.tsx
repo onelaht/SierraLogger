@@ -1,8 +1,7 @@
 // react
 import React, {ChangeEvent, useCallback, useState} from "react";
 // global vars
-import {useTag} from "../Providers/ProviderTag";
-import {useGrid} from "../Providers/ProviderGrid";
+import {useAccount} from "../Providers/ProviderAccount";
 // types
 import {Row} from "../Types/Row";
 import {ColDef, ISelectCellEditorParams} from "ag-grid-community";
@@ -24,8 +23,7 @@ import {LogTagsMUI} from "./MUIStyling/LogTagsMUI"
 
 export default function LogTags() {
     // global vars
-    const {setColDefs, gridRef} = useGrid();
-    const {tagDefs, setTagDefs} = useTag();
+    const {setColDefs, tagDefs, setTagDefs, gridRef} = useAccount();
     // track tags with edit mode enabled
     const [edit, setEdit] = useState<string>("");
     // assign tag and params (new tags)
