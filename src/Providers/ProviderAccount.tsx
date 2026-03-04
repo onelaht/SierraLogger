@@ -16,7 +16,9 @@ interface IAccountContextType {
     rowData: Row[];
     setRowData: React.Dispatch<React.SetStateAction<Row[]>>;
     colDefs: ColDef<Row>[];
+    setColDefs: React.Dispatch<React.SetStateAction<ColDef<Row>[]>>;
     tagDefs: ColDef<Row>[];
+    setTagDefs: React.Dispatch<React.SetStateAction<ColDef<Row>[]>>;
     handleDefs: (rawAccName:string, rawRowData: Row[], rawColDef: ColDef<Row>[], rawTagDef: ColDef<Row>[]) => void;
 }
 
@@ -102,7 +104,7 @@ export default function ProviderAccount({children}:{children:React.ReactNode}) {
     }, [setColDefs, setTagDefs, setRowData, convertDuration])
 
     return (
-        <AccountContext value={{gridRef, accName, rowData, setRowData, colDefs, tagDefs, handleDefs}}>
+        <AccountContext value={{gridRef, accName, rowData, setRowData, colDefs, setColDefs, tagDefs, setTagDefs, handleDefs}}>
             {children}
         </AccountContext>
     )
