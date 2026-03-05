@@ -9,6 +9,8 @@ import {LogAccountsMUI} from "./MUIStyling/LogAccountsMUI";
 import {useInitializer} from "../Providers/ProviderIniitalizer";
 // react router (get path)
 import {useNavigate} from "react-router-dom"
+// split component
+import LogAccountCreator from "./LogAccountCreator";
 
 export default function LogAccountSelector() {
     // get path
@@ -42,6 +44,7 @@ export default function LogAccountSelector() {
                     ))}
                 </AccordionDetails>
             </Accordion>
+            <LogAccountCreator/>
         </Box>
     )
 }

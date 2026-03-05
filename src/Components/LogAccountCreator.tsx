@@ -14,27 +14,37 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {Row} from "../Types/Row";
 import {IAccountData} from "../Types/IAccountData";
 import {IAccount} from "../Types/IAccount";
-import {useGrid} from "../Providers/ProviderGrid";
-import {useTag} from "../Providers/ProviderTag";
-import {useFilter} from "../Providers/ProviderFilter";
-import {defaultColDefs} from "../Types/defaultColDefs";
 import {ColDef} from "ag-grid-community";
+import {useInitializer} from "../Providers/ProviderIniitalizer";
+import {useAccount} from "../Providers/ProviderAccount";
+import {defaultColDefs} from "../Types/defaultColDefs";
 
 export default function LogAccountCreator() {
     // global vars
-    const {gridRef, colDefs, setAccounts, accounts, setRowData, setColDefs} = useGrid();
-    const {tagDefs, setTagDefs} = useTag();
-    const {setUniqueAccount, setUniqueSymbol} = useFilter();
+    const {setAccountNames} = useInitializer();
+    const {gridRef, colDefs, tagDefs, handleDefs} = useAccount();
     // MUI; hidden file upload form
     const VisuallyHiddenInput = styled('input')(HiddenInput);
-    // store raw user log data
-    const [gridData, setGridData] = useState<string | null>(null);
     // store account name
     const [accountName, setAccountName] = useState<string>("");
     // store filename
     const [filename, setFilename] = useState<string>("");
     // store user log file
     const [rawString, setRawString] = useState<ArrayBuffer | string | null>(null);
+
+    const uploadRawString = useCallback(async() => {
+        const res = await fetch("/api/upload", {
+            method: "POST",
+            headers: {
+                "Content-Type" : "application/json"
+            },
+            body: JSON.stringify({rawString: rawString})
+        })
+        if(!res.ok)
+            return;
+        const data = await res.json();
+        handleDefs("", data?.data as Row[] ?? [], defaultColDefs, []);
+    }, [rawString, handleDefs])
 
     // read in and save user data
     const readInFile = useCallback((data:File | null) => {
@@ -43,32 +53,31 @@ export default function LogAccountCreator() {
         setFilename(data.name);
         // read file
         const reader = new FileReader();
-        reader.onload = () => {
-            // save data
-            setRawString(reader.result);
-        }
+        // save data
+        reader.onload = ()=> setRawString(reader.result);
         reader.readAsBinaryString(data);
     }, [])
 
-    const refreshAccounts = useCallback(async() => {
+    useEffect(() => {
+        if(!rawString || rawString === "") return;
+        uploadRawString();
+    }, [rawString])
+
+
+    const refreshAccountsNames = useCallback(async() => {
         // fetch data
-        const res = await fetch("/api/retrieveAccounts")
+        const res = await fetch("/api/getAccountNames")
         // if any error occurs
         if(!res.ok) {
             const err = res.text();
-            console.error("Error occurred in fetchAccounts: ", res.status, err);
+            console.error("Error occurred in refreshAccountNames: ", res.status, err);
         }
         // get values
         const data = await res.json();
         // if not empty, initialize account map
-        if(data?.accounts?.length > 0) {
-            const temp:Map<string, IAccountData> = new Map<string, IAccountData>();
-            data.accounts.forEach((i:IAccount) => {
-                temp.set(i.AccName, i.Data);
-            })
-            setAccounts(temp);
-        }
-    }, [setAccounts])
+        if(data?.names?.length > 0)
+            setAccountNames(data.names);
+    }, [setAccountNames])
 
     // splits sc defs from user-defined tags
     const unsplitDef = useMemo(() => {
@@ -112,9 +121,9 @@ export default function LogAccountCreator() {
             const text = await res.text();
             console.error("Error occurred in createAccount():", res.status, text);
         } else
-            await refreshAccounts();
+            await refreshAccountsNames();
 
-    }, [gridRef, unsplitDef, tagDefs, accountName, refreshAccounts])
+    }, [gridRef, unsplitDef, tagDefs, accountName, refreshAccountsNames])
 
     return (
         <>
