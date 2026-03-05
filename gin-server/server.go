@@ -18,17 +18,18 @@ import (
 // - returns nil if raw user data is empty
 // - returns error message if any error occurs
 func rawUpload(c *gin.Context) {
-	var data types.RawFile
+	type payload struct {
+		UserData string `json:"rawString"`
+	}
+	var data payload
 	// prompt if error occurs
 	if err := c.BindJSON(&data); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	relation, uSymbol, uAccount := userdata.ManageData(data.UserData)
+	relation, _, _ := userdata.ManageData(data.UserData)
 	c.JSON(http.StatusOK, gin.H{
-		"data":     relation,
-		"uSymbol":  uSymbol,
-		"uAccount": uAccount,
+		"data": relation,
 	})
 }
 
