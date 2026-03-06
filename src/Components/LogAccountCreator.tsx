@@ -42,8 +42,8 @@ export default function LogAccountCreator() {
         })
         if(!res.ok)
             return;
-        const data = await res.json();
-        handleDefs("", data?.data as Row[] ?? [], defaultColDefs, []);
+        const data:{data:Row[]} = await res.json();
+        handleDefs("", data?.data ?? [], defaultColDefs, []);
     }, [rawString, handleDefs])
 
     // read in and save user data
@@ -62,7 +62,6 @@ export default function LogAccountCreator() {
         if(!rawString || rawString === "") return;
         uploadRawString();
     }, [rawString])
-
 
     const refreshAccountsNames = useCallback(async() => {
         // fetch data
