@@ -1,5 +1,5 @@
 // react
-import {useCallback, useEffect, useRef} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 // flex-layout
 import {Layout, Model, TabNode} from 'flexlayout-react';
 import 'flexlayout-react/style/light.css';
@@ -22,7 +22,7 @@ export default function LogLayout() {
     // global vars
     const {handleDefs} = useAccount();
     // flexlayout ui model
-    const model:Model = Model.fromJson(Layout1)
+    const [model] = useState<Model>(Model.fromJson(Layout1))
     // renders components using specified flexlayout model
     const factory = useCallback((node:TabNode) => {
         // reads in model and retrieves values for "components"

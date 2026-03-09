@@ -47,7 +47,6 @@ export default function ProviderAccount({children}:{children:React.ReactNode}) {
     // - combines tagDef and colDef (if both exists)
     // - assigns [] if passed tagDef and colDef is empty
     const handleDefs = useCallback((rawAccName:string, rawRowData: Row[], rawColDef:ColDef<Row>[], rawTagDef:ColDef<Row>[]) => {
-        console.log(rawRowData, rawColDef);
         setAccName(rawAccName ?? "");
         setRowData(rawRowData ?? []);
         // var to store modified colDef arr
