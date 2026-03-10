@@ -13,7 +13,7 @@ import {useNavigate} from "react-router-dom"
 import LogAccountCreator from "./LogAccountCreator";
 
 export default function LogAccountSelector() {
-    // get path
+    // go to path
     const nav = useNavigate();
     // global vars
     const {accountNames} = useInitializer();

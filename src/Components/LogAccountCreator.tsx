@@ -1,3 +1,6 @@
+// react
+import React, {useCallback, useEffect, useMemo, useState} from "react";
+// mui components
 import {
     Accordion,
     AccordionDetails,
@@ -9,17 +12,23 @@ import {
     Typography
 } from "@mui/material";
 import {HiddenInput, LogAccountsMUI} from "./MUIStyling/LogAccountsMUI";
-import React, {useCallback, useEffect, useMemo, useState} from "react";
+// mui icons
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+// types and interfaces
 import {Row} from "../Types/Row";
 import {IAccountData} from "../Types/IAccountData";
 import {IAccount} from "../Types/IAccount";
 import {ColDef} from "ag-grid-community";
+import {defaultColDefs} from "../Types/defaultColDefs";
+// react router
+import {useNavigate} from "react-router-dom";
+// global vars
 import {useInitializer} from "../Providers/ProviderIniitalizer";
 import {useAccount} from "../Providers/ProviderAccount";
-import {defaultColDefs} from "../Types/defaultColDefs";
 
 export default function LogAccountCreator() {
+    // go tp path
+    const nav = useNavigate();
     // global vars
     const {setAccountNames} = useInitializer();
     const {gridRef, colDefs, tagDefs, handleDefs} = useAccount();
@@ -32,6 +41,7 @@ export default function LogAccountCreator() {
     // store user log file
     const [rawString, setRawString] = useState<ArrayBuffer | string | null>(null);
 
+    // convert txt file to array of Row type
     const uploadRawString = useCallback(async() => {
         const res = await fetch("/api/upload", {
             method: "POST",
@@ -63,6 +73,7 @@ export default function LogAccountCreator() {
         uploadRawString();
     }, [rawString])
 
+    // reloads account name list
     const refreshAccountsNames = useCallback(async() => {
         // fetch data
         const res = await fetch("/api/getAccountNames")
@@ -121,8 +132,9 @@ export default function LogAccountCreator() {
             console.error("Error occurred in createAccount():", res.status, text);
         } else
             await refreshAccountsNames();
+        nav(`/${accountName}`);
 
-    }, [gridRef, unsplitDef, tagDefs, accountName, refreshAccountsNames])
+    }, [gridRef, unsplitDef, tagDefs, accountName, refreshAccountsNames, nav])
 
     return (
         <>

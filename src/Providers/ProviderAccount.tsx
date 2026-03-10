@@ -47,8 +47,9 @@ export default function ProviderAccount({children}:{children:React.ReactNode}) {
     // - combines tagDef and colDef (if both exists)
     // - assigns [] if passed tagDef and colDef is empty
     const handleDefs = useCallback((rawAccName:string, rawRowData: Row[], rawColDef:ColDef<Row>[], rawTagDef:ColDef<Row>[]) => {
-        setAccName(rawAccName ?? "");
-        setRowData(rawRowData ?? []);
+        setAccName(rawAccName);
+        setRowData(rawRowData);
+        setTagDefs(rawTagDef);
         // var to store modified colDef arr
         const temp:ColDef<Row>[] = [];
         // traverse through colDef arr
@@ -93,7 +94,6 @@ export default function ProviderAccount({children}:{children:React.ReactNode}) {
         // if tags exists
         if(rawTagDef?.length > 0) {
             // append to current colDef arr
-            setTagDefs(rawTagDef);
             rawTagDef.forEach((i:ColDef<Row>) => {
                 temp.push(i);
             })
