@@ -16,9 +16,8 @@ import {HiddenInput, LogAccountsMUI} from "./MUIStyling/LogAccountsMUI";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 // types and interfaces
 import {Row} from "../Types/Row";
-import {IAccountData} from "../Types/IAccountData";
-import {IAccount} from "../Types/IAccount";
 import {ColDef} from "ag-grid-community";
+import {IAccount} from "../Types/IAccount";
 import {defaultColDefs} from "../Types/defaultColDefs";
 // react router
 import {useNavigate} from "react-router-dom";
@@ -110,15 +109,12 @@ export default function LogAccountCreator() {
         gridRef.current.api?.forEachNode((i) => {
             if(i?.data) rowData.push(i.data);
         });
-        // initialize account type
-        const accData:IAccountData = {
+        // initialize account
+        const acc:IAccount = {
+            AccName: accountName,
             RowData: rowData,
             ColDefs: unsplitDef,
             TagDefs: tagDefs
-        };
-        const acc:IAccount = {
-            AccName: accountName,
-            Data: accData
         };
         // send data to backend
         const res = await fetch("api/saveNewAccount", {

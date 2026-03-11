@@ -12,7 +12,7 @@ import (
 // NewAccount
 // insert account data as new tuple
 // - returns nil if successful
-// - returns error message if any errors occurs
+// - returns err if any errors occurs
 func NewAccount(acc types.Account) error {
 	ctx := context.Background()
 	// connect user and db
@@ -24,9 +24,9 @@ func NewAccount(acc types.Account) error {
 	// create instance to execute queries
 	queries := db.New(conn)
 	// jsonify data
-	mColDefs, _ := json.Marshal(acc.Data.ColDefs)
-	mTagDefs, _ := json.Marshal(acc.Data.TagDefs)
-	mRowData, _ := json.Marshal(acc.Data.RowData)
+	mColDefs, _ := json.Marshal(acc.ColDefs)
+	mTagDefs, _ := json.Marshal(acc.TagDefs)
+	mRowData, _ := json.Marshal(acc.RowData)
 	// create account
 	_, err = queries.CreateAccount(ctx, db.CreateAccountParams{
 		Name:    acc.AccName,
@@ -40,8 +40,12 @@ func NewAccount(acc types.Account) error {
 	return nil
 }
 
-func GetAccount(accName string) (*types.Accs, error) {
-	var acc types.Accs
+// GetAccount
+// retrieves account by name
+// - returns account if successful
+// - returns nil and err if any errors occurs
+func GetAccount(accName string) (*types.Account, error) {
+	var acc types.Account
 	ctx := context.Background()
 	// connect user and db
 	conn, err := pgx.Connect(ctx, "postgres://user1:pass@localhost:5432/db1_proj1?sslmode=disable")
@@ -63,6 +67,10 @@ func GetAccount(accName string) (*types.Accs, error) {
 	return &acc, nil
 }
 
+// GetAccountNames
+// retrieves all account name in db
+// - returns array of account name if successful
+// - returns nil and err if any errors occursG
 func GetAccountNames() []string {
 	ctx := context.Background()
 	// connect user and db
@@ -79,45 +87,4 @@ func GetAccountNames() []string {
 		return nil
 	}
 	return names
-}
-
-// GetAllAccount
-// retrieves all tuples from account table
-// - returns an empty array if empty or any error occurs
-func GetAllAccount() []types.Account {
-	ctx := context.Background()
-	// connect user and db
-	conn, err := pgx.Connect(ctx, "postgres://user1:pass@localhost:5432/db1_proj1?sslmode=disable")
-	if err != nil {
-		return nil
-	}
-	defer conn.Close(ctx)
-	queries := db.New(conn)
-
-	table, err := queries.GetAllAccounts(ctx)
-	if err != nil {
-		return nil
-	}
-	// initialize array
-	var accounts []types.Account
-	for _, value := range table {
-		// cast type
-		var accData types.AccountData
-		var account types.Account
-		// unmarshal json
-		if err := json.Unmarshal(value.Coldefs, &accData.ColDefs); err != nil {
-			return nil
-		}
-		if err := json.Unmarshal(value.Rowdata, &accData.RowData); err != nil {
-			return nil
-		}
-		if err := json.Unmarshal(value.Tagdefs, &accData.TagDefs); err != nil {
-			return nil
-		}
-		// insert and append data
-		account.AccName = value.Name
-		account.Data = accData
-		accounts = append(accounts, account)
-	}
-	return accounts
 }
