@@ -42,6 +42,48 @@ func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (A
 	return i, err
 }
 
+const getAccount = `-- name: GetAccount :one
+SELECT name, coldefs, tagdefs, rowdata
+FROM accounts
+WHERE name = $1
+`
+
+func (q *Queries) GetAccount(ctx context.Context, name string) (Account, error) {
+	row := q.db.QueryRow(ctx, getAccount, name)
+	var i Account
+	err := row.Scan(
+		&i.Name,
+		&i.Coldefs,
+		&i.Tagdefs,
+		&i.Rowdata,
+	)
+	return i, err
+}
+
+const getAccountNames = `-- name: GetAccountNames :many
+SELECT name FROM accounts
+`
+
+func (q *Queries) GetAccountNames(ctx context.Context) ([]string, error) {
+	rows, err := q.db.Query(ctx, getAccountNames)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			return nil, err
+		}
+		items = append(items, name)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getAllAccounts = `-- name: GetAllAccounts :many
 SELECT name, coldefs, tagdefs, rowdata FROM accounts
 `

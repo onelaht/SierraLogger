@@ -1,15 +1,15 @@
 // react
 import React, {useCallback, useEffect, useMemo, useState} from "react";
 // global vars
-import {useGrid} from "../Providers/ProviderGrid";
+import {useAccount} from "../Providers/ProviderAccount";
 // mui components
 import {Box, Checkbox, FormControl, ListItemText, MenuItem, Typography} from "@mui/material";
 // mui styling
-import {LogColVisibilityMUI} from "./LogColVisibilityMUI";
+import {LogColVisibilityMUI} from "./MUIStyling/LogColVisibilityMUI";
 
 export default function LogColVisibility() {
     // global vars
-    const {gridRef, colDefs} = useGrid();
+    const {gridRef, colDefs} = useAccount();
     // selected cols
     const [colMap, setColMap] = useState<Map<string, boolean>>(new Map<string, boolean>());
 

@@ -8,3 +8,11 @@ RETURNING *;
 
 -- name: GetAllAccounts :many
 SELECT * FROM accounts;
+
+-- name: GetAccountNames :many
+SELECT name FROM accounts;
+
+-- name: GetAccount :one
+SELECT *
+FROM accounts
+WHERE name = $1;

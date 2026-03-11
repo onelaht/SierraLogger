@@ -18,17 +18,18 @@ import (
 // - returns nil if raw user data is empty
 // - returns error message if any error occurs
 func rawUpload(c *gin.Context) {
-	var data types.RawFile
+	type payload struct {
+		UserData string `json:"rawString"`
+	}
+	var data payload
 	// prompt if error occurs
 	if err := c.BindJSON(&data); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	relation, uSymbol, uAccount := userdata.ManageData(data.UserData)
+	relation, _, _ := userdata.ManageData(data.UserData)
 	c.JSON(http.StatusOK, gin.H{
-		"data":     relation,
-		"uSymbol":  uSymbol,
-		"uAccount": uAccount,
+		"data": relation,
 	})
 }
 
@@ -57,14 +58,36 @@ func saveNewAccount(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{})
 }
 
-// retrieveAccounts
-// returns value of GetAllAccount()
-func retrieveAccounts(c *gin.Context) {
+// getAccountNames
+// returns all account name from db
+// - returns 200 and array of names if successful
+// - returns error message if any error occurs
+func getAccountNames(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"accounts": db_accounts.GetAllAccount(),
+		"names": db_accounts.GetAccountNames(),
 	})
 }
 
+// getAccount
+// returns account based on provided account name
+// - returns 200 and array of names if successful
+// - returns error message if any error occurs
+func getAccount(c *gin.Context) {
+	type Payload struct {
+		AccName string `json:"name"`
+	}
+	var payload Payload
+	// prompt if error occurs during data retrieval
+	if err := c.BindJSON(&payload); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+	}
+	acc, _ := db_accounts.GetAccount(payload.AccName)
+	c.JSON(http.StatusOK, gin.H{
+		"account": acc,
+	})
+}
+
+// main
 // contains endpoint initialization and handlers
 func main() {
 	// initialize gin
@@ -72,7 +95,8 @@ func main() {
 	// upload endpoint handler
 	router.POST("/upload", rawUpload)
 	router.POST("/saveNewAccount", saveNewAccount)
-	router.GET("/retrieveAccounts", retrieveAccounts)
+	router.POST("/getAccount", getAccount)
+	router.GET("/getAccountNames", getAccountNames)
 	// run via localhost:5000
 	err := router.Run(":5000")
 	// exit if any error occurs

@@ -1,4 +1,4 @@
-export const LogFetcherMUI = {
+export const SpinnerTemplateMUI = {
     Container: {
         backgroundColor: "grey",
         width: "100%",
