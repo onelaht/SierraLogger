@@ -4,8 +4,10 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 // ag grid: registration
-import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
-ModuleRegistry.registerModules([AllCommunityModule]);
+import { AllCommunityModule as AG_ACM, ModuleRegistry as AG_MR} from 'ag-grid-community';
+import { AllCommunityModule as AC_ACM, ModuleRegistry as AC_MR} from "ag-charts-community";
+AG_MR.registerModules([AG_ACM]);
+AC_MR.registerModules([AC_ACM]);
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
