@@ -8,7 +8,7 @@
 ### 2. Configure NodeJS (npm)  
 - https://nodejs.org/en/download/current  
 
-## Running client and server  
+## Development Build (Run server and client locally)
 
 ### 1. Download project repo  
 - `git clone https://github.com/onelaht/LogApp.git`   
