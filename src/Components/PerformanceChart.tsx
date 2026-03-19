@@ -1,14 +1,33 @@
 import {AgCharts} from "ag-charts-react";
 import {
     AgChartOptions,
-    LegendModule,
-    ModuleRegistry,
-    PieSeriesModule,
 } from "ag-charts-community";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Box} from "@mui/material";
+import {useLocation} from "react-router-dom";
 
 export default function PerformanceChart() {
+
+    const {pathname} = useLocation();
+
+    const fromBackend = async () => {
+        const res = await fetch("/api/getAccountStats", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({name: pathname.substring(1)})
+        })
+        if(!res.ok)
+            console.error("Error", res.statusText);
+        const data = await res.json();
+        console.log(data);
+    }
+
+    useEffect(() => {
+        if(pathname == "/") return;
+        fromBackend();
+    }, [])
 
     const WLdata =  [
         {title: "Wins", value: 51},
