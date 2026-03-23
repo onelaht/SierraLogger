@@ -2,88 +2,73 @@ import {AgCharts} from "ag-charts-react";
 import {
     AgChartOptions,
 } from "ag-charts-community";
-import {useEffect, useState} from "react";
-import {Box} from "@mui/material";
-import {useLocation} from "react-router-dom";
+import {useCallback, useEffect, useMemo, useState} from "react";
+import {Box, Typography} from "@mui/material";
+import {useAccount} from "../Providers/ProviderAccount";
+
+
+interface chartData {
+    title: string,
+    value: number
+}
 
 export default function PerformanceChart() {
 
-    const {pathname} = useLocation();
+    const {rowData} = useAccount();
 
-    const fromBackend = async () => {
-        const res = await fetch("/api/getAccountStats", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({name: pathname.substring(1)})
+    const getRow = useCallback((column:string):number[] =>  {
+        const col:number[] = [];
+        rowData.forEach((i) => {
+            if(column in i)
+                if(typeof i[column] === "string")
+                    col.push(parseFloat(i[column] as string))
         })
-        if(!res.ok)
-            console.error("Error", res.statusText);
-        const data = await res.json();
-        console.log(data);
-    }
+        return col
+    }, [rowData])
 
-    useEffect(() => {
-        if(pathname == "/") return;
-        fromBackend();
-    }, [])
+    const getWLData:chartData[] = useMemo(() => {
+        // get pl account col
+        const profitLoss = getRow("Profit/Loss (C)");
+        // counter for won and loss
+        let won:number = 0;
+        let loss:number = 0;
+        // loop through pl ool
+        profitLoss.forEach((i:number) => {
+            if(i < 0) loss++;
+            else won++;
+        })
+        // create chart data type
+        const temp:chartData[] = [
+            {title: "Won", value: won},
+            {title: "Loss", value: loss}
+        ]
+        return temp;
+    }, [getRow])
 
-    const WLdata =  [
-        {title: "Wins", value: 51},
-        {title: "Losses", value: 49}
-    ];
-    const SymbolData = [
-        {title: "ES", value: 80},
-        {title: "NQ", value: 15},
-        {title: "RTY", value: 5}
-    ]
-    const TradeTypeData = [
-        {title: "Short", value: 75},
-        {title: "Long", value: 25}
-    ]
-    const [WLPieChart] = useState<AgChartOptions>({
-        data: WLdata,
-        title: {text: "Winning/Losing Trades"},
-        series: [
-            {
-                type: "pie",
-                angleKey: "value",
-                calloutLabelKey: "title",
-                sectorLabelKey: "value",
-            }
-        ]
-    })
-    const [SymbolPieChart] = useState<AgChartOptions>({
-        data: SymbolData,
-        title: {text: "Symbols Used"},
-        series: [
-            {
-                type: "pie",
-                angleKey: "value",
-                calloutLabelKey: "title",
-                sectorLabelKey: "value",
-            }
-        ]
-    })
-    const [TradeTypePieChart] = useState<AgChartOptions>({
-        data: TradeTypeData,
-        title: {text: "Trade Type"},
-        series: [
-            {
-                type: "pie",
-                angleKey: "value",
-                calloutLabelKey: "title",
-                sectorLabelKey: "value",
-            }
-        ]
-    })
+    const WLPieChart = useMemo<AgChartOptions>(() => {
+        return {
+            data: getWLData,
+            title: {text: "Winning/Losing Trades"},
+            series: [
+                {
+                    type: "pie",
+                    angleKey: "value",
+                    calloutLabelKey: "title",
+                    sectorLabelKey: "value",
+                }
+            ]
+        }
+    }, [getWLData])
 
     return (
-        <Box sx={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
-            <AgCharts options={WLPieChart}/>
-            <AgCharts options={SymbolPieChart}/>
-            <AgCharts options={TradeTypePieChart}/>
-        </Box>
+        <>
+            {(!rowData || rowData.length === 0) ?
+                <Typography> Nothing </Typography>
+            :
+                <Box sx={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
+                    <AgCharts options={WLPieChart}/>
+                </Box>
+            }
+        </>
     )
 }
