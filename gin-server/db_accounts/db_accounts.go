@@ -54,7 +54,7 @@ func GetAccount(accName string) (*types.Account, error) {
 	}
 	defer conn.Close(ctx)
 	queries := db.New(conn)
-	//
+	// get account data from db
 	tuple, err := queries.GetAccount(ctx, accName)
 	if err != nil {
 		return nil, err
@@ -79,10 +79,10 @@ func GetAccountNames() []string {
 		return nil
 	}
 	defer conn.Close(ctx)
-	//
 	queries := db.New(conn)
+	// retrieve acc name att from db
 	names, err := queries.GetAccountNames(ctx)
-	//
+	// if any error occurs return nil
 	if err != nil {
 		return nil
 	}
