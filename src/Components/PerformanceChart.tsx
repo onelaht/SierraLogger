@@ -3,10 +3,11 @@ import {
     AgChartOptions,
 } from "ag-charts-community";
 import {useMemo} from "react";
-import {Box, Typography} from "@mui/material";
+import {Box, Grid, Typography} from "@mui/material";
 import {useAccount} from "../Providers/ProviderAccount";
 import {Row} from "../Types/Row";
 import {toUpper} from "lodash";
+import WarningTemplate from "./Templates/WarningTemplate";
 
 
 interface chartData {
@@ -156,12 +157,87 @@ export default function PerformanceChart() {
     return (
         <>
             {(!rowData || rowData.length === 0) ?
-                <Typography> Nothing </Typography>
+                <WarningTemplate caption={"No account loaded"}/>
             :
-                <Box sx={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
-                    <AgCharts options={wlPieChart}/>
-                    <AgCharts options={symbolPieChart}/>
-                    <AgCharts options={tradeTypePieChart}/>
+                <Box height="auto" width="auto" margin="1rem">
+                    <Grid container spacing={3} justifyItems="center">
+                        <Grid size={4}>
+                            <AgCharts options={wlPieChart}/>
+                        </Grid>
+                        <Grid size={4}>
+                            <AgCharts options={symbolPieChart}/>
+                        </Grid>
+                        <Grid size={4}>
+                            <AgCharts options={tradeTypePieChart}/>
+                        </Grid>
+
+                        <Grid size={4}>
+                            <Box border={1} width="100%" height="100%" justifyItems="center" margin="0.5rem">
+                                <Typography>Current PL</Typography>
+                                <Typography variant="h5">$384.32</Typography>
+                            </Box>
+                        </Grid>
+
+                        <Grid size={4}>
+                            <Box border={1} width="100%" height="100%" justifyItems="center" margin="0.5rem">
+                                <Typography>Max Profit PL</Typography>
+                                <Typography variant="h5">$1000.32</Typography>
+                            </Box>
+                        </Grid>
+
+                        <Grid size={4}>
+                            <Box border={1} width="100%" height="100%" justifyItems="center" margin="0.5rem">
+                                <Typography>Max Loss</Typography>
+                                <Typography variant="h5">$ -(1000.32)</Typography>
+                            </Box>
+                        </Grid>
+
+                        <Grid size={4}>
+                            <Box border={1} width="100%" height="100%" justifyItems="center" margin="0.5rem">
+                                <Typography>Avg Hold Time</Typography>
+                                <Typography variant="h5">00:05:32</Typography>
+                            </Box>
+                        </Grid>
+
+                        <Grid size={4}>
+                            <Box border={1} width="100%" height="100%" justifyItems="center" margin="0.5rem">
+                                <Typography>Avg Profit</Typography>
+                                <Typography variant="h5">$123.43</Typography>
+                            </Box>
+                        </Grid>
+
+                        <Grid size={4}>
+                            <Box border={1} width="100%" height="100%" justifyItems="center" margin="0.5rem">
+                                <Typography>Avg Loss</Typography>
+                                <Typography variant="h5">$ -(23.21)</Typography>
+                            </Box>
+                        </Grid>
+
+                        <Grid size={4}>
+                            <Box border={1} width="100%" height="100%" justifyItems="center" margin="0.5rem">
+                                <Typography>Frequent Win  Tag</Typography>
+                                <Typography variant="h5">VAL</Typography>
+                                <Typography variant="subtitle2">Value Area Entry</Typography>
+                            </Box>
+                        </Grid>
+
+                        <Grid size={4}>
+                            <Box border={1} width="100%" height="100%" justifyItems="center" margin="0.5rem">
+                                <Typography>Frequent Loss Tag</Typography>
+                                <Typography variant="h5">FOMO</Typography>
+                                <Typography variant="subtitle2">Entry Reason</Typography>
+                            </Box>
+                        </Grid>
+
+                        <Grid size={4}>
+                            <Box border={1} width="100%" height="100%" justifyItems="center" margin="0.5rem">
+                                <Typography>Frequent Tag</Typography>
+                                <Typography variant="h5">C</Typography>
+                                <Typography variant="subtitle2">Trade Grade</Typography>
+                            </Box>
+                        </Grid>
+
+                    </Grid>
                 </Box>
             }
         </>
