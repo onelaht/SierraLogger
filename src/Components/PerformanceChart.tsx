@@ -154,10 +154,94 @@ export default function PerformanceChart() {
         }
     }, [getTradeTypeData])
 
+    const getCumPL = useMemo(():number => {
+        // get pl col
+        const pl:number[] = [];
+        rowData.forEach((i) => {
+            if("Profit/Loss (C)" in i)
+                (typeof i["Profit/Loss (C)"] === "string") ? pl.push(parseFloat(i["Profit/Loss (C)"]))
+                    : pl.push(i["Profit/Loss (C)"])
+        })
+        let cumPL:number = 0;
+        // loop through pl col
+        pl.forEach((i) => {
+            cumPL += i;
+        })
+        return cumPL
+    }, [rowData])
+
+    const getMaxProfit = useMemo(():number => {
+        // get pl col
+        const pl:number[] = [];
+        rowData.forEach((i) => {
+            if("Profit/Loss (C)" in i)
+                (typeof i["Profit/Loss (C)"] === "string") ? pl.push(parseFloat(i["Profit/Loss (C)"]))
+                    : pl.push(i["Profit/Loss (C)"])
+        })
+        let maxProfit:number = Number.MIN_VALUE;
+        // loop through pl col
+        pl.forEach((i) => { if(maxProfit < i) maxProfit = i;})
+        return maxProfit;
+    }, [rowData])
+
+    const getMaxLoss = useMemo(():number => {
+        // get pl col
+        const pl:number[] = [];
+        rowData.forEach((i) => {
+            if("Profit/Loss (C)" in i)
+                (typeof i["Profit/Loss (C)"] === "string") ? pl.push(parseFloat(i["Profit/Loss (C)"]))
+                    : pl.push(i["Profit/Loss (C)"])
+        })
+        let maxLoss:number = Number.MAX_VALUE;
+        // loop through pl col
+        pl.forEach((i) => { if(maxLoss > i) maxLoss = i;})
+        return maxLoss;
+    }, [rowData])
+
+    const getAverageProfit = useMemo(():number => {
+        // get pl col
+        const profits:number[] = [];
+        rowData.forEach((i) => {
+            let pl:number = 0;
+            // normalize col value to number
+            if("Profit/Loss (C)" in i)
+                pl = (typeof i["Profit/Loss (C)"] === "string") ? parseFloat(i["Profit/Loss (C)"]) : i["Profit/Loss (C)"];
+            // add to array if over 0
+            if(pl > 0) profits.push(pl);
+        })
+        // get sum get pl
+        let sum:number = 0;
+        profits.forEach((i) => {sum += i})
+        // return average
+        return sum/profits.length;
+    }, [rowData])
+
+    const getAverageLoss = useMemo(():number => {
+        // get pl col
+        const losses:number[] = [];
+        rowData.forEach((i) => {
+            let pl:number = 0;
+            // normalize col value to number
+            if("Profit/Loss (C)" in i)
+                pl = (typeof i["Profit/Loss (C)"] === "string") ? parseFloat(i["Profit/Loss (C)"]) : i["Profit/Loss (C)"];
+            // add to array if over 0
+            if(pl < 0) losses.push(pl);
+        })
+        // get sum get pl
+        let sum:number = 0;
+        losses.forEach((i) => {sum += i})
+        // return average
+        return sum/losses.length;
+    }, [rowData])
+
+    const getProfitFactor = useMemo(():number => {
+        return getAverageProfit/Math.abs(getAverageLoss);
+    }, [getAverageProfit, getAverageLoss])
+
     return (
         <>
             {(!rowData || rowData.length === 0) ?
-                <WarningTemplate caption={"No account loaded"}/>
+                <WarningTemplate caption={"No account selected"}/>
             :
                 <Box height="auto" width="auto" margin="1rem">
                     <Grid container spacing={3} justifyItems="center">
@@ -173,70 +257,45 @@ export default function PerformanceChart() {
 
                         <Grid size={4}>
                             <Box border={1} width="100%" height="100%" justifyItems="center" margin="0.5rem">
-                                <Typography>Current PL</Typography>
-                                <Typography variant="h5">$384.32</Typography>
+                                <Typography>Profit Factor</Typography>
+                                <Typography variant="h5">{getProfitFactor.toFixed(2)}</Typography>
                             </Box>
                         </Grid>
 
                         <Grid size={4}>
                             <Box border={1} width="100%" height="100%" justifyItems="center" margin="0.5rem">
-                                <Typography>Max Profit PL</Typography>
-                                <Typography variant="h5">$1000.32</Typography>
+                                <Typography>Average Profit</Typography>
+                                <Typography variant="h5">$ {getAverageProfit.toFixed((2))}</Typography>
+                            </Box>
+                        </Grid>
+
+                        <Grid size={4}>
+                            <Box border={1} width="100%" height="100%" justifyItems="center" margin="0.5rem">
+                                <Typography>Average Loss</Typography>
+                                <Typography variant="h5">$ {getAverageLoss.toFixed(2)}</Typography>
+                            </Box>
+                        </Grid>
+
+                        <Grid size={4}>
+                            <Box border={1} width="100%" height="100%" justifyItems="center" margin="0.5rem">
+                                <Typography>Current PL</Typography>
+                                <Typography variant="h5">$ {getCumPL.toFixed(2)}</Typography>
+                            </Box>
+                        </Grid>
+
+                        <Grid size={4}>
+                            <Box border={1} width="100%" height="100%" justifyItems="center" margin="0.5rem">
+                                <Typography>Max Profit</Typography>
+                                <Typography variant="h5">$ {getMaxProfit.toFixed(2)}</Typography>
                             </Box>
                         </Grid>
 
                         <Grid size={4}>
                             <Box border={1} width="100%" height="100%" justifyItems="center" margin="0.5rem">
                                 <Typography>Max Loss</Typography>
-                                <Typography variant="h5">$ -(1000.32)</Typography>
+                                <Typography variant="h5">$ {getMaxLoss.toFixed(2)}</Typography>
                             </Box>
                         </Grid>
-
-                        <Grid size={4}>
-                            <Box border={1} width="100%" height="100%" justifyItems="center" margin="0.5rem">
-                                <Typography>Avg Hold Time</Typography>
-                                <Typography variant="h5">00:05:32</Typography>
-                            </Box>
-                        </Grid>
-
-                        <Grid size={4}>
-                            <Box border={1} width="100%" height="100%" justifyItems="center" margin="0.5rem">
-                                <Typography>Avg Profit</Typography>
-                                <Typography variant="h5">$123.43</Typography>
-                            </Box>
-                        </Grid>
-
-                        <Grid size={4}>
-                            <Box border={1} width="100%" height="100%" justifyItems="center" margin="0.5rem">
-                                <Typography>Avg Loss</Typography>
-                                <Typography variant="h5">$ -(23.21)</Typography>
-                            </Box>
-                        </Grid>
-
-                        <Grid size={4}>
-                            <Box border={1} width="100%" height="100%" justifyItems="center" margin="0.5rem">
-                                <Typography>Frequent Win  Tag</Typography>
-                                <Typography variant="h5">VAL</Typography>
-                                <Typography variant="subtitle2">Value Area Entry</Typography>
-                            </Box>
-                        </Grid>
-
-                        <Grid size={4}>
-                            <Box border={1} width="100%" height="100%" justifyItems="center" margin="0.5rem">
-                                <Typography>Frequent Loss Tag</Typography>
-                                <Typography variant="h5">FOMO</Typography>
-                                <Typography variant="subtitle2">Entry Reason</Typography>
-                            </Box>
-                        </Grid>
-
-                        <Grid size={4}>
-                            <Box border={1} width="100%" height="100%" justifyItems="center" margin="0.5rem">
-                                <Typography>Frequent Tag</Typography>
-                                <Typography variant="h5">C</Typography>
-                                <Typography variant="subtitle2">Trade Grade</Typography>
-                            </Box>
-                        </Grid>
-
                     </Grid>
                 </Box>
             }
