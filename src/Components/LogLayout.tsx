@@ -13,6 +13,7 @@ import LogTable from "./LogTable"
 import LogColVisibility from "./LogColVisibility";
 import LogTags from "./LogTags";
 import LogAccountSelector from "./LogAccountSelector";
+import PerformanceChart from "./PerformanceChart";
 
 export default function LogLayout() {
     // get path
@@ -30,6 +31,7 @@ export default function LogLayout() {
         // render additional components based on value
         switch(component) {
             case "Accounts": return <LogAccountSelector/>
+            case "PerformanceChart": return <PerformanceChart/>
             case "ColumnVisibility": return <LogColVisibility/>
             case "Tags": return <LogTags/>
             case "Table": return <LogTable/>

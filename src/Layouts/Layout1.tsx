@@ -44,6 +44,12 @@ export const Layout1:IJsonModel = {
                         name: "Table",
                         component: "Table",
                         enableClose: false,
+                    },
+                    {
+                        type: "tab",
+                        name: "Performance",
+                        component: "PerformanceChart",
+                        enableClose: false,
                     }
                 ]
             }
