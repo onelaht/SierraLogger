@@ -1,12 +1,8 @@
 package db_accounts
 
 import (
-	"context"
-	"encoding/json"
-	"example/gin-server/db"
 	"example/gin-server/types"
-
-	"github.com/jackc/pgx/v5"
+	"fmt"
 )
 
 // NewAccount
@@ -14,29 +10,65 @@ import (
 // - returns nil if successful
 // - returns err if any errors occurs
 func NewAccount(acc types.Account) error {
-	ctx := context.Background()
-	// connect user and db
-	conn, err := pgx.Connect(ctx, "postgres://user1:pass@localhost:5432/db1_proj1?sslmode=disable")
-	if err != nil {
-		return err
+	// if rowData is empty or dne, ignore
+	if acc.RowData == nil || len(acc.RowData) == 0 {
+		return nil
 	}
-	defer conn.Close(ctx)
-	// create instance to execute queries
-	queries := db.New(conn)
-	// jsonify data
-	mColDefs, _ := json.Marshal(acc.ColDefs)
-	mTagDefs, _ := json.Marshal(acc.TagDefs)
-	mRowData, _ := json.Marshal(acc.RowData)
-	// create account
-	_, err = queries.CreateAccount(ctx, db.CreateAccountParams{
-		Name:    acc.AccName,
-		Coldefs: mColDefs,
-		Tagdefs: mTagDefs,
-		Rowdata: mRowData,
-	})
-	if err != nil {
-		return err
+	// attributes provided by sierra chart
+	sierraSet := map[string]struct{}{
+		"Entry DateTime":                 struct{}{},
+		"Exit DateTime":                  struct{}{},
+		"Duration":                       struct{}{},
+		"Symbol":                         struct{}{},
+		"Trade Type":                     struct{}{},
+		"Entry Price":                    struct{}{},
+		"Exit Price":                     struct{}{},
+		"Low Price While Open":           struct{}{},
+		"High Price While Open":          struct{}{},
+		"Profit/Loss (C)":                struct{}{},
+		"Max Open Profit (C)":            struct{}{},
+		"Max Open Loss (C)":              struct{}{},
+		"Commission (C)":                 struct{}{},
+		"Trade Quantity":                 struct{}{},
+		"Open Position Quantity":         struct{}{},
+		"Close Position Quantity":        struct{}{},
+		"Max Open Quantity":              struct{}{},
+		"Max Closed Quantity":            struct{}{},
+		"Entry Efficiency":               struct{}{},
+		"Exit Efficiency":                struct{}{},
+		"Total Efficiency":               struct{}{},
+		"FlatToFlat Profit/Loss (C)":     struct{}{},
+		"FlatToFlat Max Open Loss (C)":   struct{}{},
+		"FlatToFlat Max Open Profit (C)": struct{}{},
+		"Note":                           struct{}{},
 	}
+
+	// initialize db account
+	//
+
+	// use account id to store ag grid coldef config
+	//
+
+	// use account id to store ag grid tagdef config
+	//
+
+	// traverse per tuple
+	for i, tuple := range acc.RowData {
+		// use tuple index and create map where values {sierra: [], tags: []}
+		fmt.Println(i)
+		// traverse per attribute in tuple
+		for j := range tuple {
+			// add to sierra chart subset, if part of sierra chart standard att
+			if _, ok := sierraSet[j]; ok {
+				fmt.Println("This is part of Sierra Chart Statistics (" + j + ")")
+				// add to user defined tags subset, if not part of sierra chart standard att
+			} else {
+				fmt.Println("This is part of Sierra Chart Statistics (" + j + ")")
+			}
+		}
+		// add both query to chunk
+	}
+
 	return nil
 }
 
@@ -45,26 +77,7 @@ func NewAccount(acc types.Account) error {
 // - returns account if successful
 // - returns nil and err if any errors occurs
 func GetAccount(accName string) (*types.Account, error) {
-	var acc types.Account
-	ctx := context.Background()
-	// connect user and db
-	conn, err := pgx.Connect(ctx, "postgres://user1:pass@localhost:5432/db1_proj1?sslmode=disable")
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Close(ctx)
-	queries := db.New(conn)
-	// get account data from db
-	tuple, err := queries.GetAccount(ctx, accName)
-	if err != nil {
-		return nil, err
-	}
-	// set to var
-	acc.AccName = tuple.Name
-	json.Unmarshal(tuple.Rowdata, &acc.RowData)
-	json.Unmarshal(tuple.Coldefs, &acc.ColDefs)
-	json.Unmarshal(tuple.Tagdefs, &acc.TagDefs)
-	return &acc, nil
+	return nil, nil
 }
 
 // GetAccountNames
@@ -72,19 +85,5 @@ func GetAccount(accName string) (*types.Account, error) {
 // - returns array of account name if successful
 // - returns nil and err if any errors occursG
 func GetAccountNames() []string {
-	ctx := context.Background()
-	// connect user and db
-	conn, err := pgx.Connect(ctx, "postgres://user1:pass@localhost:5432/db1_proj1?sslmode=disable")
-	if err != nil {
-		return nil
-	}
-	defer conn.Close(ctx)
-	queries := db.New(conn)
-	// retrieve acc name att from db
-	names, err := queries.GetAccountNames(ctx)
-	// if any error occurs return nil
-	if err != nil {
-		return nil
-	}
-	return names
+	return nil
 }
